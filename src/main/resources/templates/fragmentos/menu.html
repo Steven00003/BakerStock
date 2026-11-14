@@ -1,0 +1,20 @@
+<nav th:fragment="menu" class="navbar navbar-dark bg-dark">
+	<div class="container">
+		<span class="navbar-brand">BakerStock</span>
+		<ul class="navbar-nav flex-row gap-3 me-auto mb-0">
+			<li class="nav-item"><a class="nav-link" th:href="@{/}">Inicio</a></li>
+			<li class="nav-item" sec:authorize="hasRole('ADMINISTRADOR')">
+				<a class="nav-link" th:href="@{/admin/usuarios}">Usuarios</a>
+			</li>
+			<li class="nav-item" sec:authorize="hasAnyRole('COMPRADOR', 'ADMINISTRADOR')">
+				<a class="nav-link" th:href="@{/proveedores}">Proveedores</a>
+			</li>
+			<li class="nav-item" sec:authorize="hasAnyRole('ADMINISTRADOR', 'COMPRADOR', 'ALMACENISTA', 'PANADERO')">
+				<a class="nav-link" th:href="@{/insumos}">Insumos</a>
+			</li>
+		</ul>
+		<form th:action="@{/logout}" method="post" class="mb-0">
+			<button type="submit" class="btn btn-outline-light btn-sm">Cerrar sesión</button>
+		</form>
+	</div>
+</nav>

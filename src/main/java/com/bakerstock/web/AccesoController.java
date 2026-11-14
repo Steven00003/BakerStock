@@ -16,4 +16,9 @@ public class AccesoController {
 		return "inicio";
 	}
 
+	@GetMapping("/acceso-denegado")
+	public String accesoDenegado() {
+		return "error/403";
+	}
+
 }
