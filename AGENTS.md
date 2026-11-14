@@ -59,6 +59,7 @@ Plantillas en `src/main/resources/templates/<modulo>/`. Pruebas en `src/test/jav
 8. **Códigos de error de negocio:** `STOCK_INSUFICIENTE`, `LOTE_VENCIDO`, `ACCESO_DENEGADO`, `DATO_DUPLICADO`, `DATO_INVALIDO`. Las respuestas de rechazo indican la causa y, si aplica, el faltante.
 9. **Cantidades** siempre en la unidad base del insumo (g, ml o unidad) usando `BigDecimal` (nunca `double`).
 10. **Fechas:** `LocalDate` y `LocalDateTime` con zona `America/Bogota`; el vencimiento se compara contra la fecha actual del servidor.
+11. Enums: nunca columnas ENUM nativas de MySQL. Usa @Enumerated(EnumType.STRING) con @JdbcTypeCode(SqlTypes.VARCHAR) y @Column(length = 40), para que añadir valores no exija ALTER TABLE.
 
 ## Comandos
 

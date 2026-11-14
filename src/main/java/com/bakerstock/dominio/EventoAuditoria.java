@@ -14,6 +14,9 @@ import jakarta.persistence.PreRemove;
 import jakarta.persistence.PreUpdate;
 import jakarta.persistence.Table;
 
+import org.hibernate.annotations.JdbcTypeCode;
+import org.hibernate.type.SqlTypes;
+
 @Entity
 @Table(name = "evento_auditoria")
 public class EventoAuditoria {
@@ -29,11 +32,13 @@ public class EventoAuditoria {
 	private String usuarioCorreo;
 
 	@Enumerated(EnumType.STRING)
-	@Column(nullable = false, updatable = false)
+	@JdbcTypeCode(SqlTypes.VARCHAR)
+	@Column(nullable = false, updatable = false, length = 40)
 	private AccionAuditoria accion;
 
 	@Enumerated(EnumType.STRING)
-	@Column(nullable = false, updatable = false)
+	@JdbcTypeCode(SqlTypes.VARCHAR)
+	@Column(nullable = false, updatable = false, length = 40)
 	private ResultadoAuditoria resultado;
 
 	@Column(updatable = false)

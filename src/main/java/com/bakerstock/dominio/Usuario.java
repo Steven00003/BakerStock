@@ -12,6 +12,9 @@ import jakarta.persistence.Id;
 import jakarta.persistence.PrePersist;
 import jakarta.persistence.Table;
 
+import org.hibernate.annotations.JdbcTypeCode;
+import org.hibernate.type.SqlTypes;
+
 @Entity
 @Table(name = "usuario")
 public class Usuario {
@@ -30,7 +33,8 @@ public class Usuario {
 	private String contrasenaHash;
 
 	@Enumerated(EnumType.STRING)
-	@Column(nullable = false)
+	@JdbcTypeCode(SqlTypes.VARCHAR)
+	@Column(nullable = false, length = 40)
 	private Rol rol;
 
 	@Column(nullable = false)
