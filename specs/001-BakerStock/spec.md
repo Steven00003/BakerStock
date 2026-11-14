@@ -19,7 +19,7 @@ Estos puntos estaban abiertos al redactar. Cada uno lleva una propuesta por defe
 | D-03 | Quién consulta proveedores | La Tabla 8 solo asigna el registro al Comprador | Comprador registra y consulta; Administrador consulta (regla de «todas las consultas») |
 | D-04 | Categorías de insumo | HU-05 pide categoría sin decir si es lista fija o catálogo editable | Lista fija: HARINAS, LACTEOS_Y_HUEVOS, GRASAS, LEVADURAS_Y_AGENTES, AZUCARES, RELLENOS_Y_FRUTAS, EMPAQUES, OTROS |
 | D-05 | Producto terminado y precio de venta | El dominio del documento no lista la entidad Producto y las ventas y CR-001 (10 % del valor de la venta) necesitan un precio | Incluir la entidad `Producto` (nombre, precio de venta, stock) ligada 1:1 a su `Receta` desde el modelo de datos de v1.0; se programa en Sprint 2 |
-| D-06 | Base de datos en Render | Render gratis no ofrece MySQL | `dev`: MySQL local; `cloud`: H2 en modo MySQL, igual que en la actividad de Spring (la persistencia en Render es de demostración) |
+| D-06 | Base de datos en la nube | Render no ofrece MySQL y no se usará H2 | MySQL en todos los perfiles (decisión del equipo): `dev` y `test` en MySQL local; `cloud` con un MySQL en línea de otro proveedor al que se conecta la aplicación desplegada en Render |
 | D-07 | Capa de servicios | El documento describe controladores → servicios → repositorios; el docente indicó el 4 de noviembre que con JPA no debe haber capa service | Sin capa service (ADR-004); las reglas viven en el dominio y en transacciones |
 | D-08 | Días para alerta de vencimiento (REQ-BAK-007) | El documento ya lo marca «por confirmar» | 3 días o menos |
 

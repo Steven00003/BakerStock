@@ -19,10 +19,10 @@ Si algo contradice a la especificación, gana la especificación. Si algo no est
 
 - Java 21, Maven, Spring Boot 3.5.x (rama 3).
 - Spring Web MVC, Thymeleaf, Bootstrap (CDN), `thymeleaf-extras-springsecurity6`.
-- Spring Data JPA, MySQL (perfil `dev`), H2 en modo MySQL (perfil `cloud`).
+- Spring Data JPA y **MySQL en todos los perfiles** (`dev`, `cloud` y `test`). **Prohibido H2** u otra base embebida.
 - Spring Security con BCrypt.
 - Bean Validation (`spring-boot-starter-validation`).
-- Pruebas: JUnit 5, Mockito, Spring Boot Test, `spring-security-test`.
+- Pruebas: JUnit 5, Mockito, Spring Boot Test, `spring-security-test`, contra un esquema MySQL aparte (`bakerstock_test`). Las pruebas `@DataJpaTest` llevan `@AutoConfigureTestDatabase(replace = Replace.NONE)` para no sustituir MySQL.
 - Despliegue: Docker y Render.
 - **Prohibido sin autorización del Product Owner:** Lombok, MapStruct, Flyway/Liquibase, bibliotecas de correo, JWT, cualquier dependencia nueva.
 
@@ -68,7 +68,7 @@ Plantillas en `src/main/resources/templates/<modulo>/`. Pruebas en `src/test/jav
 ./mvnw spring-boot:run -Dspring-boot.run.profiles=dev
 ```
 
-Variables de entorno (nunca en el repositorio): `DB_URL`, `DB_USER`, `DB_PASSWORD`, `BAKERSTOCK_SEED_PASSWORD` (opcional; si falta, el seeder genera una contraseña aleatoria y la imprime una sola vez en el log).
+Variables de entorno (nunca en el repositorio): `DB_URL`, `DB_USER`, `DB_PASSWORD`, `DB_TEST_URL` (esquema `bakerstock_test`, mismo usuario), `BAKERSTOCK_SEED_PASSWORD` (opcional; si falta, el seeder genera una contraseña aleatoria y la imprime una sola vez en el log).
 
 ## Definition of Done (resumen; completa en la especificación y el documento del docente)
 

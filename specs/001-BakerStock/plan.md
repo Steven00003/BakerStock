@@ -34,8 +34,7 @@ Las operaciones de varios pasos (Sprint 2) usan `@Transactional` en el método d
 | `spring-boot-starter-security` | Autenticación y roles | REQ-BAK-015…021 |
 | `spring-boot-starter-data-jpa` | Persistencia | todos |
 | `spring-boot-starter-validation` | Validación de formularios | REQ-BAK-023, NFR-BAK-004 |
-| `mysql-connector-j` (runtime) | MySQL en `dev` | ADR-002 |
-| `h2` (runtime) | Perfil `cloud` y pruebas | ADR-005 |
+| `mysql-connector-j` (runtime) | MySQL en `dev`, `cloud` y `test` | ADR-002 |
 | `spring-boot-starter-test`, `spring-security-test` | Pruebas | DoD |
 
 Sin Lombok, sin biblioteca de correo y sin migraciones (se usa `ddl-auto=update` en `dev` y `cloud`).
@@ -45,8 +44,8 @@ Sin Lombok, sin biblioteca de correo y sin migraciones (se usa `ddl-auto=update`
 | Perfil | Base de datos | Notas |
 |--------|---------------|-------|
 | `dev` | MySQL local (`bakerstock_db`) con `DB_URL`, `DB_USER`, `DB_PASSWORD` | `ddl-auto=update`; siembra de datos ficticios |
-| `cloud` | H2 en memoria modo MySQL | Para Render; siembra de datos ficticios |
-| `test` | H2 en memoria | Pruebas automáticas; sin siembra |
+| `cloud` | MySQL en línea con `DB_URL`, `DB_USER`, `DB_PASSWORD` del proveedor elegido | `ddl-auto=update`; siembra solo si la base está vacía |
+| `test` | MySQL local, esquema `bakerstock_test` (`DB_TEST_URL`) | `ddl-auto=create-drop`; sin siembra |
 
 Propiedades comunes: `server.servlet.session.timeout=30m`, `spring.jpa.open-in-view=false`, zona horaria `America/Bogota`.
 
@@ -112,7 +111,7 @@ Autenticación por formulario (`/login`), sesión HTTP, CSRF activado, contrase�
 | Tipo | Herramienta | Qué cubre |
 |------|-------------|-----------|
 | Dominio | JUnit 5 | `Lote.estaVencido`, `Insumo.stockTotal`, `Insumo.stockUtilizable` (AC-026.x) |
-| Repositorio | `@DataJpaTest` (H2) | Búsqueda sin mayúsculas, unicidad, orden FEFO |
+| Repositorio | `@DataJpaTest` (MySQL de pruebas) | Búsqueda sin mayúsculas, unicidad, orden FEFO |
 | Web y seguridad | `@SpringBootTest` + `MockMvc` + `@WithMockUser`/`spring-security-test` | AC-008, 015…028 |
 | Configuración | `@SpringBootTest` | AC-N003.1 |
 
@@ -120,7 +119,7 @@ Cada prueba lleva el ID del criterio en `@DisplayName` (por ejemplo `@DisplayNam
 
 ## 8. Despliegue
 
-`Dockerfile` en dos etapas (Maven build → JRE 21), perfil `cloud`, puerto desde `PORT`. Render (plan gratuito): la base H2 en memoria se reinicia en cada despliegue; los datos de demostración los repone el seeder (ADR-005).
+`Dockerfile` en dos etapas (Maven build → JRE 21), perfil `cloud`, puerto desde `PORT`. Render no ofrece MySQL: la aplicación se despliega allí y se conecta a un MySQL en línea de otro proveedor mediante variables de entorno (ADR-005). El despliegue espera a tener esa base.
 
 ## 9. Decisiones (ADR)
 
@@ -139,4 +138,5 @@ Cada prueba lleva el ID del criterio en `@DisplayName` (por ejemplo `@DisplayNam
 | SpecFall | La especificación se cierra en 2 días; el esqueleto Spring y el login arrancan antes de la Puerta 2 en paralelo |
 | Reglas de acceso inconsistentes | Una sola configuración de rutas en `SecurityConfig` y pruebas por rol (AC-008, AC-021) |
 | Datos de demostración con contraseñas débiles | Contraseña por variable de entorno o aleatoria impresa una vez |
+| Las pruebas dependen de un MySQL local activo | README con el paso de crear `bakerstock_test`; si molesta, se evalúa Testcontainers con el PO (dependencia nueva) |
 | Plazo: el Sprint 1 termina el 17 de noviembre | Calendario sugerido en `tasks.md`; los HU-06, 07 y 08 son los primeros candidatos a pasar al Sprint 2 si se acaba el tiempo (decisión con el PO en la Review) |
