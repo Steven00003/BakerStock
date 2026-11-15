@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.server.ResponseStatusException;
 
 import com.bakerstock.dominio.AccionAuditoria;
@@ -25,6 +26,8 @@ import com.bakerstock.repositorio.InsumoRepository;
 
 import jakarta.validation.Valid;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
 
 @Controller
 public class InsumoController {
@@ -42,6 +45,26 @@ public class InsumoController {
 	public String nuevo(Model model) {
 		model.addAttribute("formulario", new InsumoForm());
 		return "insumos/form";
+	}
+
+	@GetMapping("/insumos")
+	public String lista(@RequestParam(name = "q", required = false) String texto,
+			@RequestParam(name = "categoria", required = false) String categoria, Model model) {
+		Categoria filtro = null;
+		if (categoria != null && !categoria.isBlank()) {
+			try {
+				filtro = Categoria.valueOf(categoria);
+			} catch (IllegalArgumentException e) {
+				filtro = null;
+			}
+		}
+		String patron = (texto != null && !texto.isBlank()) ? texto.trim() : null;
+		List<Insumo> resultados = insumoRepository.buscar(patron, filtro);
+		model.addAttribute("insumos", resultados);
+		model.addAttribute("categorias", Categoria.values());
+		model.addAttribute("q", patron != null ? patron : "");
+		model.addAttribute("categoria", filtro != null ? filtro.name() : "");
+		return "insumos/lista";
 	}
 
 	@GetMapping("/insumos/{id}")
