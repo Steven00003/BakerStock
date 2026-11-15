@@ -16,6 +16,7 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.OneToMany;
+import jakarta.persistence.OrderBy;
 import jakarta.persistence.Table;
 
 /**
@@ -50,6 +51,7 @@ public class Insumo {
 	private boolean activo;
 
 	@OneToMany(mappedBy = "insumo")
+	@OrderBy("fechaVencimiento ASC, id ASC")
 	private List<Lote> lotes = new ArrayList<>();
 
 	public BigDecimal stockTotal() {
@@ -58,8 +60,11 @@ public class Insumo {
 				.reduce(BigDecimal.ZERO, BigDecimal::add);
 	}
 
-	public BigDecimal stockUtilizable() {
-		LocalDate hoy = LocalDate.now();
+	/**
+	 * Suma de cantidadActual de los lotes cuya fecha de vencimiento no es
+	 * anterior a hoy (RN-04): un lote que vence hoy todavía es utilizable.
+	 */
+	public BigDecimal stockUtilizable(LocalDate hoy) {
 		return lotes.stream()
 				.filter(lote -> !lote.estaVencido(hoy))
 				.map(Lote::getCantidadActual)
