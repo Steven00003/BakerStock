@@ -17,11 +17,13 @@ import org.springframework.stereotype.Component;
 import com.bakerstock.dominio.Categoria;
 import com.bakerstock.dominio.Insumo;
 import com.bakerstock.dominio.Lote;
+import com.bakerstock.dominio.Proveedor;
 import com.bakerstock.dominio.Rol;
 import com.bakerstock.dominio.UnidadBase;
 import com.bakerstock.dominio.Usuario;
 import com.bakerstock.repositorio.InsumoRepository;
 import com.bakerstock.repositorio.LoteRepository;
+import com.bakerstock.repositorio.ProveedorRepository;
 import com.bakerstock.repositorio.UsuarioRepository;
 
 @Component
@@ -34,13 +36,16 @@ public class DataSeeder implements ApplicationRunner {
 	private final UsuarioRepository usuarioRepository;
 	private final InsumoRepository insumoRepository;
 	private final LoteRepository loteRepository;
+	private final ProveedorRepository proveedorRepository;
 	private final PasswordEncoder passwordEncoder;
 
 	public DataSeeder(UsuarioRepository usuarioRepository, InsumoRepository insumoRepository,
-			LoteRepository loteRepository, PasswordEncoder passwordEncoder) {
+			LoteRepository loteRepository, ProveedorRepository proveedorRepository,
+			PasswordEncoder passwordEncoder) {
 		this.usuarioRepository = usuarioRepository;
 		this.insumoRepository = insumoRepository;
 		this.loteRepository = loteRepository;
+		this.proveedorRepository = proveedorRepository;
 		this.passwordEncoder = passwordEncoder;
 	}
 
@@ -48,6 +53,26 @@ public class DataSeeder implements ApplicationRunner {
 	public void run(ApplicationArguments args) {
 		seedUsuarios();
 		seedInsumos();
+		seedProveedores();
+	}
+
+	private void seedProveedores() {
+		if (proveedorRepository.count() > 0) {
+			return;
+		}
+		for (String[] datos : new String[][] {
+				{"Distribuidora de Harinas del Valle S.A.S.", "900123456-1", "3001234567", "ventas@harinasdelvalle.test", "Calle 45 # 23-16, Bogota"},
+				{"Humedos y Lacteos Andinos S.A.S.", "900234567-2", "3102345678", "pedidos@andinoslacteos.test", "Avenida 68 # 40-10, Bogota"},
+				{"Empaques de Papel Sol Ltda.", "900345678-3", "3203456789", "contacto@empaquessol.test", "Carrera 30 # 5-51, Medellin"}}) {
+			Proveedor proveedor = new Proveedor();
+			proveedor.setNombre(datos[0]);
+			proveedor.setNit(datos[1]);
+			proveedor.setTelefono(datos[2]);
+			proveedor.setCorreo(datos[3]);
+			proveedor.setDireccion(datos[4]);
+			proveedor.setActivo(true);
+			proveedorRepository.save(proveedor);
+		}
 	}
 
 	private void seedUsuarios() {
