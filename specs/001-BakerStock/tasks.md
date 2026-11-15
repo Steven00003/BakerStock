@@ -18,7 +18,7 @@
 | S1-04 | Criterios Given/When/Then (mínimo 30, con casos de borde) y **Puerta 1** con el PO | AC-xxx | Ana | David | S1-03 | 3 |
 | S1-05 | `plan.md` y ADR-001 a ADR-005 (**Puerta 2**) | Plan | David | Ana | S1-04 | 3 |
 | S1-06 | `tasks.md`, tablero y matriz de trazabilidad inicial (**Puerta 3**) | Tasks | Ana | David | S1-05 | 1 |
-| S1-07 | Esqueleto Spring Boot, perfiles `dev`/`cloud`/`test`, `DataSeeder`, `Dockerfile` y despliegue de prueba en Render | Plan §1-3, 8 | David | Ana | S1-02 | 4 |
+| S1-07 | Esqueleto Spring Boot, perfiles `dev`/`cloud`/`test`, `DataSeeder`, `Dockerfile` y esquema MySQL de pruebas | Plan §1-3, 8 | David | Ana | S1-02 | 4 |
 | S1-08 | HU-01: inicio y cierre de sesión con Spring Security (BCrypt, mensaje único, auditoría) | REQ-015, 016, 017, 027; NFR-002, 003 | David | Ana | S1-07 | 4 |
 | S1-09 | HU-04: menú por rol, 403 y auditoría de accesos denegados | REQ-008, 021, 027 | Ana | David | S1-08 | 2 |
 | S1-10 | HU-03: crear usuarios con rol, desactivar/activar cuentas y protección del propio Administrador | REQ-019, 020, 028; NFR-004 | Ana | David | S1-08 | 3 |
@@ -63,9 +63,9 @@
 
 **S1-07**
 - [ ] `./mvnw test` pasa con un contexto vacío
-- [ ] Arranca con perfil `dev` (MySQL local) y con `cloud` (H2)
+- [ ] Arranca con perfil `dev` (MySQL local); `./mvnw test` usa el esquema `bakerstock_test`
 - [ ] `DataSeeder` crea 5 usuarios, insumos y lotes de demostración sin contraseña en el repositorio
-- [ ] Imagen Docker construida y aplicación visible en Render
+- [ ] Imagen Docker construida (el despliegue en Render espera a tener MySQL en línea, ADR-005)
 - [ ] PR revisado por Ana, entrada en la bitácora de IA
 
 **S1-08 a S1-15 (patrón común)**

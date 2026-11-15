@@ -23,20 +23,20 @@ TAREA S1-07: crear el esqueleto del proyecto BakerStock.
 
 Haz:
 1. Proyecto Maven en la raíz: Java 21, Spring Boot 3.5.x (última de la rama 3), groupId com.bakerstock, artifactId bakerstock, paquete base com.bakerstock. Incluye Maven Wrapper (mvnw).
-2. Solo estas dependencias: web, thymeleaf, thymeleaf-extras-springsecurity6, security, data-jpa, validation, mysql-connector-j (runtime), h2 (runtime), starter-test, spring-security-test. Nada más (sin Lombok).
+2. Solo estas dependencias: web, thymeleaf, thymeleaf-extras-springsecurity6, security, data-jpa, validation, mysql-connector-j (runtime), starter-test, spring-security-test. Nada más (sin Lombok, sin H2).
 3. Paquetes vacíos con package-info.java: dominio, repositorio, web, seguridad, config.
-4. Perfiles según plan.md sección 3: application.properties (común: session timeout 30m, open-in-view false, zona America/Bogota), application-dev.properties (MySQL con DB_URL, DB_USER, DB_PASSWORD desde variables de entorno, ddl-auto=update), application-cloud.properties (H2 en memoria modo MySQL, puerto desde PORT), application-test.properties (H2).
+4. Perfiles según plan.md sección 3: application.properties (común: session timeout 30m, open-in-view false, zona America/Bogota), application-dev.properties (MySQL con DB_URL, DB_USER, DB_PASSWORD desde variables de entorno, ddl-auto=update), application-cloud.properties (MySQL con DB_URL, DB_USER, DB_PASSWORD desde variables de entorno, puerto desde PORT), application-test.properties (MySQL con DB_TEST_URL, mismo usuario, esquema bakerstock_test, ddl-auto=create-drop). Prohibido H2 o cualquier base embebida.
 5. Una clase de prueba de contexto (BakerStockApplicationTests) con perfil test que verifica que el contexto arranca.
 6. Dockerfile de dos etapas (build con Maven, ejecución con JRE 21), perfil cloud por defecto, EXPOSE desde PORT.
-7. .gitignore (target, .env, IDE) y README.md con: cómo ejecutar en dev, variables de entorno y cómo correr las pruebas.
+7. .gitignore (target, .env, IDE) y README.md con: cómo crear en MySQL las bases bakerstock_db y bakerstock_test (con CREATE DATABASE ... CHARACTER SET utf8mb4), cómo ejecutar en dev, las variables de entorno (DB_URL, DB_USER, DB_PASSWORD, DB_TEST_URL) y cómo correr las pruebas.
 8. SecurityConfig mínima que permita todo por ahora (se completa en S1-08).
 
 No hagas: entidades, controladores, vistas, ni paquete service. No incluyas contraseñas ni URLs reales. No modifiques specs/, constitution.md ni docs/adr/.
 
-Verificación: ./mvnw test en verde; ./mvnw spring-boot:run con -Dspring-boot.run.profiles=cloud arranca sin errores.
+Verificación: ./mvnw test en verde contra el MySQL local (esquema bakerstock_test); ./mvnw spring-boot:run con -Dspring-boot.run.profiles=dev arranca sin errores y crea las tablas en bakerstock_db.
 ```
 
-*Prueba de aceptación manual (Ana):* clonar, `./mvnw test`, arrancar con `cloud`, construir la imagen Docker y ver el servicio en Render.
+*Prueba de aceptación manual (Ana):* clonar, crear los esquemas MySQL, `./mvnw test`, arrancar con `dev` y construir la imagen Docker. El despliegue en Render espera a tener un MySQL en línea.
 
 ---
 

@@ -1,8 +1,11 @@
 target/
 .env
+
 .idea/
-.vscode/
 *.iml
+.vscode/
 .classpath
 .project
 .settings/
+
+*.log
