@@ -12,11 +12,24 @@ import org.springframework.security.web.SecurityFilterChain;
 @EnableWebSecurity
 public class SecurityConfig {
 
+	private final AccesoDenegadoHandler accesoDenegadoHandler;
+
+	public SecurityConfig(AccesoDenegadoHandler accesoDenegadoHandler) {
+		this.accesoDenegadoHandler = accesoDenegadoHandler;
+	}
+
 	@Bean
 	public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
 		http
 				.authorizeHttpRequests(auth -> auth
-						.requestMatchers("/login").permitAll()
+						.requestMatchers("/login", "/recuperar", "/restablecer").permitAll()
+						.requestMatchers("/admin/usuarios/**").hasRole("ADMINISTRADOR")
+						.requestMatchers("/proveedores").hasAnyRole("COMPRADOR", "ADMINISTRADOR")
+						.requestMatchers("/proveedores/nuevo").hasRole("COMPRADOR")
+						.requestMatchers("/insumos/nuevo").hasRole("ALMACENISTA")
+						.requestMatchers("/insumos", "/insumos/*")
+								.hasAnyRole("ADMINISTRADOR", "COMPRADOR", "ALMACENISTA", "PANADERO")
+						.requestMatchers("/acceso-denegado").authenticated()
 						.anyRequest().authenticated())
 				.formLogin(form -> form
 						.loginPage("/login")
@@ -26,7 +39,8 @@ public class SecurityConfig {
 				.logout(logout -> logout
 						.logoutUrl("/logout")
 						.logoutSuccessUrl("/login?logout")
-						.permitAll());
+						.permitAll())
+				.exceptionHandling(ex -> ex.accessDeniedHandler(accesoDenegadoHandler));
 		return http.build();
 	}
 
