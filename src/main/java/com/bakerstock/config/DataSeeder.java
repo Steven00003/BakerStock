@@ -3,11 +3,13 @@ package com.bakerstock.config;
 import java.math.BigDecimal;
 import java.security.SecureRandom;
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.HexFormat;
 import java.util.List;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.ApplicationArguments;
 import org.springframework.boot.ApplicationRunner;
 import org.springframework.context.annotation.Profile;
@@ -35,19 +37,23 @@ public class DataSeeder implements ApplicationRunner {
 	private final InsumoRepository insumoRepository;
 	private final LoteRepository loteRepository;
 	private final PasswordEncoder passwordEncoder;
+	private final boolean cargaDemo;
 
 	public DataSeeder(UsuarioRepository usuarioRepository, InsumoRepository insumoRepository,
-			LoteRepository loteRepository, PasswordEncoder passwordEncoder) {
+			LoteRepository loteRepository, PasswordEncoder passwordEncoder,
+			@Value("${bakerstock.carga-demo:false}") boolean cargaDemo) {
 		this.usuarioRepository = usuarioRepository;
 		this.insumoRepository = insumoRepository;
 		this.loteRepository = loteRepository;
 		this.passwordEncoder = passwordEncoder;
+		this.cargaDemo = cargaDemo;
 	}
 
 	@Override
 	public void run(ApplicationArguments args) {
 		seedUsuarios();
 		seedInsumos();
+		seedCargaDemo();
 	}
 
 	private void seedUsuarios() {
@@ -87,6 +93,51 @@ public class DataSeeder implements ApplicationRunner {
 		lote(azucar, "AZU-001", "30000", hoy.minusDays(20), hoy.plusDays(200));
 		lote(mantequilla, "MAN-001", "8000", hoy.minusDays(15), hoy.plusDays(45));
 		lote(huevo, "HUE-001", "150", hoy.minusDays(2), hoy.plusDays(12));
+	}
+
+	/**
+	 * Carga opcional para medir NFR-BAK-001 (AC-N001.1): completa la base de
+	 * datos hasta 50 insumos y 200 lotes. Se activa con la propiedad
+	 * bakerstock.carga-demo=true (por ejemplo al arrancar:
+	 * --bakerstock.carga-demo=true).
+	 */
+	private void seedCargaDemo() {
+		if (!cargaDemo) {
+			return;
+		}
+		LocalDate hoy = LocalDate.now();
+		long faltanInsumos = 50 - insumoRepository.count();
+		List<Insumo> demo = new ArrayList<>();
+		for (int i = 1; i <= faltanInsumos; i++) {
+			Categoria[] categorias = Categoria.values();
+			Insumo insumo = new Insumo();
+			insumo.setNombre("Insumo de demostración " + i);
+			insumo.setUnidadBase(i % 3 == 0 ? UnidadBase.UNIDAD : (i % 3 == 2 ? UnidadBase.ML : UnidadBase.G));
+			insumo.setCategoria(categorias[i % categorias.length]);
+			insumo.setStockMinimo(new BigDecimal("1000"));
+			insumo.setActivo(true);
+			demo.add(insumo);
+		}
+		insumoRepository.saveAll(demo);
+
+		long faltanLotes = 200 - loteRepository.count();
+		List<Lote> porGuardar = new ArrayList<>();
+		for (int n = 1; n <= faltanLotes; n++) {
+			Insumo insumo = demo.get((int) ((n - 1) % demo.size()));
+			Lote lote = new Lote();
+			lote.setInsumo(insumo);
+			lote.setNumeroLote("DEMO-" + n);
+			BigDecimal cantidad = new BigDecimal(100 + (n % 20) * 250);
+			lote.setCantidadInicial(cantidad);
+			lote.setCantidadActual(cantidad);
+			lote.setCostoUnitario(new BigDecimal("1.500"));
+			lote.setFechaRecepcion(hoy.minusDays(10 + n % 100));
+			lote.setFechaVencimiento(n % 10 == 0 ? hoy.minusDays(n % 30 + 1) : hoy.plusDays((n % 350) + 1));
+			porGuardar.add(lote);
+		}
+		loteRepository.saveAll(porGuardar);
+		log.info("Carga de demostración aplicada: {} insumos y {} lotes en total",
+				insumoRepository.count(), loteRepository.count());
 	}
 
 	private Insumo insumo(String nombre, UnidadBase unidadBase, Categoria categoria, String stockMinimo) {

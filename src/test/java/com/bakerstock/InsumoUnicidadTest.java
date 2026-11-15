@@ -56,7 +56,7 @@ class InsumoUnicidadTest {
 		Insumo insumo = crear("Levadura seca");
 
 		assertThat(insumo.stockTotal()).isEqualByComparingTo(BigDecimal.ZERO);
-		assertThat(insumo.stockUtilizable()).isEqualByComparingTo(BigDecimal.ZERO);
+		assertThat(insumo.stockUtilizable(LocalDate.now())).isEqualByComparingTo(BigDecimal.ZERO);
 	}
 
 	@Test
@@ -72,7 +72,7 @@ class InsumoUnicidadTest {
 		Insumo recargado = entityManager.find(Insumo.class, insumo.getId());
 
 		assertThat(recargado.stockTotal()).isEqualByComparingTo(new BigDecimal("1600"));
-		assertThat(recargado.stockUtilizable()).isEqualByComparingTo(new BigDecimal("1300"));
+		assertThat(recargado.stockUtilizable(hoy)).isEqualByComparingTo(new BigDecimal("1300"));
 	}
 
 	private Lote lote(Insumo insumo, BigDecimal cantidad, LocalDate vencimiento) {
